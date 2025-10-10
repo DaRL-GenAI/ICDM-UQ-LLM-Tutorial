@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutorial: Uncertainty Quantification and Confidence Calibration in LLMs</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+  
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background-color: #f9f9f9;
+    }
+    
+    
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #ffffff;
+      padding: 10px 30px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+    
+    .logo img {
+      height: 75px;
+      width: auto;
+    }
+    
+    /* Navigation */
+    .navbar {
+      display: flex;
+      background-color: #2c3e50;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .navbar a {
+      text-decoration: none;
+      color: #ffffff;
+      padding: 12px 24px;
+      font-weight: 500;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .navbar a:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 20px;
+      width: 1px;
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .navbar a:hover {
+      background-color: #34495e;
+      color: #fff;
+    }
+    
+    .navbar a:active {
+      background-color: #1a252f;
+    }
+    
+    /* Hero section */
+    .hero {
+      margin-top: 70px; 
+      background-image: url('background3.jpg');
+      background-size: cover;
+      background-position: center;
+      padding: 100px 20px;
+      color: white;
+      text-align: center;
+      position: relative;
+    }
+    
+    
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.4);
+      z-index: 1;
+    }
+    
+    .hero-content {
+      position: relative;
+      z-index: 2;
+    }
+    
+    .hero h1 {
+      font-size: 2.5em;
+      font-weight: 700;
+      margin-bottom: 20px;
+      line-height: 1.2;
+      color: #ffffff;
+    }
+    
+    .hero p {
+      font-size: 1.2em;
+      font-weight: 300;
+      margin-bottom: 10px;
+      color: #ffffff;
+    }
+    
+    .hero a {
+      color: #ffffff;
+      text-decoration: underline;
+      transition: opacity 0.3s ease;
+    }
+    
+    .hero a:hover {
+      opacity: 0.8;
+    }
+    
+    /* Sections */
+    section {
+      padding: 60px 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    
+    h2 {
+      margin-bottom: 30px;
+      font-size: 2em;
+      font-weight: 600;
+      color: #2c3e50;
+      border-bottom: 2px solid #e0e0e0;
+      padding-bottom: 15px;
+    }
+    
+    p {
+      margin-bottom: 15px;
+      line-height: 1.8;
+      color: #555;
+    }
+    
+    /* Schedule */
+    .schedule ul {
+      list-style-type: none;
+    }
+    
+    .schedule li {
+      margin-bottom: 20px;
+      padding-left: 20px;
+      position: relative;
+    }
+    
+    .schedule li::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      color: #2c3e50;
+    }
+    
+    .schedule strong {
+      color: #2c3e50;
+      font-weight: 600;
+    }
+    
+    /* Materials */
+    .materials ul {
+      list-style-type: none;
+    }
+    
+    .materials li {
+      margin-bottom: 15px;
+    }
+    
+    .materials a {
+      text-decoration: none;
+      color: #3498db;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+    
+    .materials a:hover {
+      color: #2980b9;
+      text-decoration: underline;
+    }
+    
+    /* Speakers */
+     .speaker-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+      margin-top: 30px;
+    }
+    
+    .speaker {
+      background-color: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      align-items: flex-start;
+      gap: 25px;
+    }
+    
+    .speaker:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .speaker img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 3px solid #f0f0f0;
+      flex-shrink: 0;
+    }
+    
+    .speaker-info {
+      flex: 1;
+    }
+    
+    .speaker-info h3 {
+      margin: 0 0 10px 0;
+      font-size: 20px;
+      font-weight: 600;
+    }
+    
+    .speaker-info h3 a {
+      color: #2c3e50;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    
+    .speaker-info h3 a:hover {
+      color: #3498db;
+      text-decoration: underline;
+    }
+    
+    .speaker-info p {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.6;
+      color: #555;
+    }
+    
+    @media (max-width: 768px) {
+      .header {
+        /* padding: 10px 15px; */
+        padding: 0;        
+      }
+      
+      .navbar {
+        gap: 0;
+      }
+      
+      .navbar a {
+        padding: 10px 16px;
+        font-size: 13px;
+      }
+      
+      .navbar a:not(:last-child)::after {
+        display: none;
+      }
+      
+      .hero h1 {
+        font-size: 1.8em;
+      }
+      
+      .hero p {
+        font-size: 1em;
+      }
+      
+      section {
+        padding: 40px 15px;
+      }
+      
+      .speaker {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+      
+      .speaker img {
+        margin-bottom: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="logo">
+      <a href="https://www3.cs.stonybrook.edu/~icdm2025/index.html/">
+        <img src="ICDMlogo.jpg" alt="ICDM Logo">
+      </a>
+    </div>
+    <nav class="navbar">
+      <a href="#home">Home</a>
+      <a href="#schedule">Schedule</a>
+      <a href="#materials">Tutorial Materials</a>
+      <a href="#contributors">Presenters</a>
+      <a href="#icdm25">ICDM'25</a>
+    </nav>
+  </header>
+
+  <div class="hero" id="home">
+    <div class="hero-content">
+      <h1>Uncertainty Quantification and Mitigation<br>in Large Language Models</h1>
+      <p>2025 ICDM Tutorial</p>
+      <p>Thursday, November 13 &nbsp; Afternoon (Details pending)</p>
+      <p>Location: <a href="https://www.hilton.com/en/hotels/dcashhh-capital-hilton/?msockid=0c542b340d2e6ee62cbf3d090c946f8e/" target="_blank">Capital Hilton</a>, 1001 16th Street NW Washington, DC 20036, USA</p>
+    </div>
+  </div>
+
+  <section class="abstract">
+    <h2>Abstract</h2>
+    <p>
+      Large Language Models (LLMs) have revolutionized numerous applications with their impressive capabilities, but their reliability remains a concern due to the lack of robust uncertainty quantification (UQ) methods. This tutorial addresses this gap by providing a comprehensive overview of UQ techniques tailored for LLMs. We explore the theoretical foundations of UQ, categorize UQ tasks, datasets, and evaluations, and delve into the sources of uncertainty in LLMs, including input, reasoning, parameter, and prediction uncertainties. Recent advances in UQ, such as novel frameworks for decomposing uncertainty into aleatoric and epistemic components, supervised approaches for uncertainty estimation, and multi-dimensional UQ frameworks, will be discussed. 
+    </p>
+    <p>
+      The tutorial is designed for researchers and practitioners from both machine learning and LLM communities, aiming to enhance the trustworthiness and reliability of LLMs in high-stakes applications. By integrating UQ into LLMs, we can improve their decision-making capabilities, address ethical considerations, and foster more reliable AI systems.
+    </p>
+  </section>
+
+  <section class="schedule" id="schedule">
+    <h2>Schedule</h2>
+    <ul>
+      <li><strong>Section 1: Introduction and Background (20 minutes)</strong><br>
+        - Large Language Models<br>
+        - Uncertainty Quantification
+      </li>
+      <li><strong>Section 2: Comprehensive Taxonomies (30 min)</strong><br>
+        - UQ Tasks<br>
+        - UQ Evaluations<br>
+      </li>
+      <li><strong>Section 3: Sources of LLM Uncertainty with White-Box and Black-Box Settings (40 min)</strong><br>
+        - Input uncertainty methods<br>
+        - Reasoning uncertainty methods<br>
+        - Model Weight uncertainty methods<br>
+        - Prediction uncertainty methods<br>
+        <br><em>(Break - 20 min)</em><br>
+      </li>
+      <li><strong>Section 4: Mitigation of LLM Uncertainty (30 min)</strong><br>
+        - Learning-based Methods<br>
+        - Non-learning-based Methods<br>
+      </li>
+      <li><strong>Section 5: Future Directions and Conclusions (30 min)</strong><br>
+        - LLM Bias in Accuracy Assessment<br>
+        - Defining Accuracy Thresholds<br>
+        - Limitations in Capturing Uncertainty Meaning<br>
+        - Meaningfulness of Uncertainty Measures<br>
+        - Dataset Availability for UQ Resources<br>
+      </li>
+      <li><strong>Q&A</strong></li>
+    </ul>
+  </section>
+
+  <section class="materials" id="materials">
+    <h2>Tutorial Materials</h2>
+    <ul>
+      <li><a href="https://drive.google.com/drive/folders/1rPsCkwhoeAIY_Vsms-QwxAnc_GvCRD2w?usp=sharing" download>Download Slides</a></li>
+      <li><a href="https://dl-acm-org.ezproxy1.lib.asu.edu/doi/abs/10.1145/3711896.3736569" download>Download Relevant Survey Paper (PDF)</a></li>
+    </ul>
+  </section>
+
+  <section class="speakers" id="contributors">
+    <h2>Presenters</h2>
+          <div class="speaker">
+        <img src="people/longchao.png" alt="Longchao Da">
+        <div class="speaker-info">
+          <h3><a href="https://longchaoda.github.io/LongchaoHere/" target="_blank">Longchao Da</a></h3>
+          <p>Longchao Da is a PhD candidate at Arizona State University. His research interests are Reinforcement Learning and Trustworthy AI (Sim-to-Real). He has publications in top venues such as NeurIPS, ICML, KDD, AAAI, IJCAI, ECML-PKDD, CIKM, CDC, CASE, IJMLC, Machine Learning, and SDM. He successfully hosted in-person hands-on tutorials at the top inter-discipline venue, ITSC 2023 in Spain, with more than 60 participants.</p>
+        </div>
+      </div>
+    <div class="speaker-grid">
+      <div class="speaker">
+        <img src="people/xiaoou.png" alt="Xiaoou Liu">
+        <div class="speaker-info">
+          <h3><a href="https://xiao0o0o.github.io/" target="_blank">Xiaoou Liu</a></h3>
+          <p>Xiaoou Liu is a second-year Ph.D. student in Computer Science at Arizona State University. Her research focuses on trustworthy machine learning, with an emphasis on explainable graph neural networks and uncertainty quantification in large language models. Her work has been published at venues such as KDD and ICCPS.</p>
+        </div>
+      </div>
+      <!-- <div class="speaker">
+        <img src="people/tiejin.png" alt="Tiejin Chen">
+        <div class="speaker-info">
+          <h3><a href="https://tiejin98.github.io/" target="_blank">Tiejin Chen</a></h3>
+          <p>Tiejin Chen is a third-year Ph.D. student in Computer Science at Arizona State University. His research interests lie in trustworthy AI and its applications, with a focus on LLM reliability and safety. He has contributed to top conferences such as KDD, ACL, and AAAI, and is actively involved in research on LLM reliability and safety.  Tiejin has published in top venues including ACL, AAAI and SDM. He also actively contributes as a reviewer for major conferences in machine learning and data mining.</p>
+        </div>
+      </div> -->
+
+      <!-- <div class="speaker">
+        <img src="people/zhenlin.jpg" alt="Zhen Lin">
+        <div class="speaker-info">
+          <h3><a href="https://zlin7.github.io/" target="_blank">Zhen Lin</a></h3>
+          <p>Zhen finished his PhD study at the University of Illinois at Urbana-Champaign, and is a researcher at Jump Trading. His research interests are Uncertainty Quantification for Deep Learning and LLM. He has publications in top venues such as NeurIPS, ICLR, ICML, KDD, AAAI, and TMLR. He also co-hosted an in-person tutorial at KDD 2023.</p>
+        </div>
+      </div> -->
+      <!-- <div class="speaker">
+        <img src="people/chacha.jpg" alt="Chacha Chen">
+        <div class="speaker-info">
+          <h3><a href="https://chacha-chen.github.io/" target="_blank">Chacha Chen</a></h3>
+          <p>Chacha Chen is a PhD candidate in Computer Science at the University of Chicago’s Human+AI Lab, advised by Chenhao Tan. Her research centers on understanding and adapting large language models for high-stakes, knowledge-intensive domains such as healthcare and on designing human-AI workflows that genuinely enhance expert decision-making. She has published papers at KDD, WWW, FAccT, ICLR, AAAI, ML4H and more, and has been recognized with the Best Applied Data Science Paper Award at ECML-PKDD 2020 and a Best Paper award at HMCaT @ ICML 2022.</p>
+        </div>
+      </div> -->
+      <div class="speaker">
+        <img src="people/hua.png" alt="Hua Wei">
+        <div class="speaker-info">
+          <h3><a href="https://labs.engineering.asu.edu/hw/" target="_blank">Hua Wei</a></h3>
+          <p>Hua Wei is an Assistant Professor in the School of Computing and Augmented Intelligence at Arizona State University. His research focuses on data mining, reinforcement learning, and uncertainty quantification. He has been awarded the Amazon Research Award for LLM uncertainty quantification and multiple Best Paper Awards on top conferences in machine learning, artificial intelligence and data mining. He has also actively organized events related to uncertainty and LLMs, such as the Workshop on Uncertainty Reasoning and Quantification in Decision Making and Agent4IR workshops at CIKM and KDD.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="icdm25" id="icdm25">
+    <h2>ICDM'25 Conference</h2>
+    <ul>
+      <li><a href="https://www3.cs.stonybrook.edu/~icdm2025/index.html" download>Main Conference Page</a></li>
+    </ul>
+  </section>
+</body>
+</html>
